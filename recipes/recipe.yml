@@ -16,17 +16,16 @@ modules:
     files:
       - source: system
         destination: / # copies files/system/* (* means everything inside it) into your image's root folder /
-
+  - type: akmods # mac internet
+    install:
+      - wl # mac internet
   - type: dnf
     repos:
       copr:
         - atim/starship
-      nonfree: rpmfusion # macbook internet
     install:
       packages:
-        - kernel-devel # macbook internet
-        - akmod-wl # macbook internet
-        - broadcom-wl # macbook internet
+        - starship
     remove:
       packages:
         # example: removing firefox (in favor of the flatpak)
