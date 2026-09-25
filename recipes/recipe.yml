@@ -24,6 +24,7 @@ modules:
       nonfree: rpmfusion # macbook internet
     install:
       packages:
+        - kernel-devel # macbook internet
         - akmod-wl # macbook internet
         - broadcom-wl # macbook internet
     remove:
