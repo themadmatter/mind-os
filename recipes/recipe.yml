@@ -1,36 +1,24 @@
----
 # yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
-# image will be published to ghcr.io/<user>/<name>
 name: mind-os
-# description will be included in the image's metadata
 description: This is my personal OS image.
+base-image: ghcr.io/ublue-os/silverblue-main
+image-version: latest 
 
-# the base image to build on top of (FROM) and the version tag to use
-base-image: ghcr.io/ublue-os/silverblue-main # ghcr.io/ublue-os/base-main
-image-version: latest # You can pin to a specific version of Fedora as well
-
-# module configuration, executed in order 
-# you can include multiple instances of the same module
 modules:
-  
-    # 1. Shrink initramfs to only include drivers required for your hardware
-  - type: initramfs
-    hostonly: true
-  
   - type: kargs
     kargs:
-      - rd.driver.blacklist=serial8250
+      - modprobe.blacklist=serial8250
       - serial8250.nr_uarts=0
+      - console=tty0
   
   - type: files
     files:
       - source: system
-        destination: / # copies files/system/* (* means everything inside it) into your image's root folder /
+        destination: /
   
   - type: systemd
     system:
       custom:
-        # Delay automatic Flatpak updates until 15 minutes after boot
         - name: flatpak-system-update.service
           enabled: true
           drop-in: true
@@ -41,7 +29,6 @@ modules:
             Nice=19
             IOSchedulingClass=best-effort
 
-        # Delay Appstream Cache updates until 20 minutes after boot
         - name: fedora-atomic-desktop-appstream-cache-refresh.service
           enabled: true
           drop-in: true
@@ -51,7 +38,6 @@ modules:
             [Service]
             Nice=19
 
-        # Cap the network wait time to 5s max so the Broadcom driver doesn't stall the desktop
         - name: NetworkManager-wait-online.service
           enabled: true
           drop-in: true
@@ -60,37 +46,30 @@ modules:
             ExecStart=
             ExecStart=/usr/bin/nm-online -s -q --timeout=5
 
-        # Delay automatic Flatpak updates until 15 minutes after boot
         - name: flatpak-system-update.timer
           enabled: true
           content: |
             [Unit]
             Description=Update Flatpaks long after boot
-            
             [Timer]
             OnBootSec=15m
             RandomizedDelaySec=5m
             Persistent=true
-             
             [Install]
             WantedBy=timers.target
 
-        # Delay Appstream Cache updates until 20 minutes after boot
         - name: fedora-atomic-desktop-appstream-cache-refresh.timer
           enabled: true
           content: |
             [Unit]
             Description=Refresh Appstream Cache long after boot
-            
             [Timer]
             OnBootSec=20m
             RandomizedDelaySec=5m
             Persistent=true
-            
             [Install]
             WantedBy=timers.target
 
-        # Force the mandatory Flatpak setup to run with low priority in the background
         - name: system-flatpak-setup.service
           enabled: true
           content: |
@@ -98,10 +77,11 @@ modules:
             Nice=19
             IOSchedulingClass=best-effort
             IOSchedulingPriority=7
-        
-  - type: akmods # mac internet
+  
+  - type: akmods
     install:
-      - wl # mac internet
+      - wl
+
   - type: dnf
     repos:
       copr:
@@ -111,18 +91,16 @@ modules:
         - starship
     remove:
       packages:
-        # example: removing firefox (in favor of the flatpak)
-        # "firefox" is the main package, "firefox-langpacks" is a dependency
         - firefox
-        - firefox-langpacks # also remove firefox dependency (not required for all packages, this is a special case)
+        - firefox-langpacks
 
   - type: default-flatpaks
     configurations:
-      - notify: true # Send notification after install/uninstall is finished (true/false)
+      - notify: true
         scope: system
-        # If no repo information is specified, Flathub will be used by default
-        install: # system flatpaks we want all users to have and not remove
+        install:
           - io.gitlab.librewolf-community
-      - scope: user # Also add Flathub user repo, but no user packages
+      - scope: user
 
-  - type: signing # this sets up the proper policy & signing files for signed images to work fully
+  - type: initramfs
+  - type: signing
