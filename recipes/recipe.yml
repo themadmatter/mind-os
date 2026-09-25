@@ -14,7 +14,7 @@ image-version: latest # You can pin to a specific version of Fedora as well
 modules:
   
   - type: kargs
-    append:
+    kargs:
       - rd.driver.blacklist=serial8250
       - serial8250.nr_uarts=0
   
