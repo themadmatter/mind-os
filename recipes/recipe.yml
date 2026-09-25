@@ -18,23 +18,23 @@ modules:
         destination: / # copies files/system/* (* means everything inside it) into your image's root folder /
   
 
-   - type: systemd
-     system:
-       custom:
-         # Delay automatic Flatpak updates until 15 minutes after boot
-         - name: flatpak-system-update.timer
-           enabled: true
-           content: |
-             [Unit]
-             Description=Update Flatpaks long after boot
+  - type: systemd
+    system:
+      custom:
+        # Delay automatic Flatpak updates until 15 minutes after boot
+        - name: flatpak-system-update.timer
+          enabled: true
+          content: |
+            [Unit]
+            Description=Update Flatpaks long after boot
             
-             [Timer]
-             OnBootSec=15m
-             RandomizedDelaySec=5m
-             Persistent=true
+            [Timer]
+            OnBootSec=15m
+            RandomizedDelaySec=5m
+            Persistent=true
              
-             [Install]
-             WantedBy=timers.target
+            [Install]
+            WantedBy=timers.target
 
         # Delay Appstream Cache updates until 20 minutes after boot
         - name: fedora-atomic-desktop-appstream-cache-refresh.timer
