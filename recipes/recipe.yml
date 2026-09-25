@@ -19,22 +19,22 @@ modules:
   
 
    - type: systemd
-    system:
-      custom:
-        # Delay automatic Flatpak updates until 15 minutes after boot
-        - name: flatpak-system-update.timer
-          enabled: true
-          content: |
-            [Unit]
-            Description=Update Flatpaks long after boot
+     system:
+       custom:
+         # Delay automatic Flatpak updates until 15 minutes after boot
+         - name: flatpak-system-update.timer
+           enabled: true
+           content: |
+             [Unit]
+             Description=Update Flatpaks long after boot
             
-            [Timer]
-            OnBootSec=15m
-            RandomizedDelaySec=5m
-            Persistent=true
-            
-            [Install]
-            WantedBy=timers.target
+             [Timer]
+             OnBootSec=15m
+             RandomizedDelaySec=5m
+             Persistent=true
+             
+             [Install]
+             WantedBy=timers.target
 
         # Delay Appstream Cache updates until 20 minutes after boot
         - name: fedora-atomic-desktop-appstream-cache-refresh.timer
