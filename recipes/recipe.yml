@@ -16,6 +16,50 @@ modules:
     files:
       - source: system
         destination: / # copies files/system/* (* means everything inside it) into your image's root folder /
+  
+
+   - type: systemd
+    system:
+      custom:
+        # Delay automatic Flatpak updates until 15 minutes after boot
+        - name: flatpak-system-update.timer
+          enabled: true
+          content: |
+            [Unit]
+            Description=Update Flatpaks long after boot
+            
+            [Timer]
+            OnBootSec=15m
+            RandomizedDelaySec=5m
+            Persistent=true
+            
+            [Install]
+            WantedBy=timers.target
+
+        # Delay Appstream Cache updates until 20 minutes after boot
+        - name: fedora-atomic-desktop-appstream-cache-refresh.timer
+          enabled: true
+          content: |
+            [Unit]
+            Description=Refresh Appstream Cache long after boot
+            
+            [Timer]
+            OnBootSec=20m
+            RandomizedDelaySec=5m
+            Persistent=true
+            
+            [Install]
+            WantedBy=timers.target
+
+        # Force the mandatory Flatpak setup to run with low priority in the background
+        - name: system-flatpak-setup.service
+          enabled: true
+          content: |
+            [Service]
+            Nice=19
+            IOSchedulingClass=best-effort
+            IOSchedulingPriority=7
+  
   - type: akmods # mac internet
     install:
       - wl # mac internet
