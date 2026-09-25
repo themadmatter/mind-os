@@ -21,8 +21,7 @@ modules:
     repos:
       copr:
         - atim/starship
-      nonfree:
-        - rpmfusion # macbook internet
+      nonfree: rpmfusion # macbook internet
     install:
       packages:
         - akmod-wl # macbook internet
