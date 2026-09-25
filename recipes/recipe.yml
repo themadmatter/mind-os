@@ -13,6 +13,10 @@ image-version: latest # You can pin to a specific version of Fedora as well
 # you can include multiple instances of the same module
 modules:
   
+    # 1. Shrink initramfs to only include drivers required for your hardware
+  - type: initramfs
+    hostonly: true
+  
   - type: kargs
     kargs:
       - rd.driver.blacklist=serial8250
@@ -26,6 +30,36 @@ modules:
   - type: systemd
     system:
       custom:
+        # Delay automatic Flatpak updates until 15 minutes after boot
+        - name: flatpak-system-update.service
+          enabled: true
+          drop-in: true
+          content: |
+            [Unit]
+            Before=
+            [Service]
+            Nice=19
+            IOSchedulingClass=best-effort
+
+        # Delay Appstream Cache updates until 20 minutes after boot
+        - name: fedora-atomic-desktop-appstream-cache-refresh.service
+          enabled: true
+          drop-in: true
+          content: |
+            [Unit]
+            Before=
+            [Service]
+            Nice=19
+
+        # Cap the network wait time to 5s max so the Broadcom driver doesn't stall the desktop
+        - name: NetworkManager-wait-online.service
+          enabled: true
+          drop-in: true
+          content: |
+            [Service]
+            ExecStart=
+            ExecStart=/usr/bin/nm-online -s -q --timeout=5
+
         # Delay automatic Flatpak updates until 15 minutes after boot
         - name: flatpak-system-update.timer
           enabled: true
@@ -64,7 +98,7 @@ modules:
             Nice=19
             IOSchedulingClass=best-effort
             IOSchedulingPriority=7
-  
+        
   - type: akmods # mac internet
     install:
       - wl # mac internet
