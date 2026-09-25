@@ -6,7 +6,7 @@ name: mind-os
 description: This is my personal OS image.
 
 # the base image to build on top of (FROM) and the version tag to use
-base-image: ghcr.io/ublue-os/base-main
+base-image: ghcr.io/ublue-os/silverblue-main # ghcr.io/ublue-os/base-main
 image-version: latest # You can pin to a specific version of Fedora as well
 
 # module configuration, executed in order
@@ -21,9 +21,12 @@ modules:
     repos:
       copr:
         - atim/starship
+      nonfree:
+        - rpmfusion # macbook internet
     install:
       packages:
-        - micro
+        - akmod-wl # macbook internet
+        - broadcom-wl # macbook internet
     remove:
       packages:
         # example: removing firefox (in favor of the flatpak)
@@ -37,8 +40,7 @@ modules:
         scope: system
         # If no repo information is specified, Flathub will be used by default
         install: # system flatpaks we want all users to have and not remove
-          - org.mozilla.firefox
-          - org.gnome.Loupe
+          - io.gitlab.librewolf-community
       - scope: user # Also add Flathub user repo, but no user packages
 
   - type: signing # this sets up the proper policy & signing files for signed images to work fully
